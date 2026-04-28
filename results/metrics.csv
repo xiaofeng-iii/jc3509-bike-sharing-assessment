@@ -1,0 +1,7 @@
+Model,Dataset,MAE,RMSE,R²
+Linear Regression,train,555.16,759.6,0.84
+Linear Regression,val,568.95,815.57,0.84
+Linear Regression,test,595.98,747.7,0.85
+Random Forest,train,178.86,257.35,0.98
+Random Forest,val,158.62,286.98,0.98
+Random Forest,test,494.02,630.7,0.9

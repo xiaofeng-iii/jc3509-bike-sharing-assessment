@@ -1,0 +1,16 @@
+Feature,Importance
+atemp,0.479
+yr,0.276
+hum,0.064
+season_1,0.042
+season_4,0.033
+windspeed,0.033
+weathersit_3,0.013
+weathersit_1,0.005
+workingday,0.004
+mnth_10,0.004
+mnth_9,0.004
+holiday,0.004
+weekday_0,0.004
+mnth_4,0.003
+weathersit_2,0.003
