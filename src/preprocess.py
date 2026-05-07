@@ -18,26 +18,17 @@ OUTPUT_CSV = OUTPUT_DIR / "day_processed.csv"
 OUTPUT_JSON = OUTPUT_DIR / "split_indices.json"
 
 def main():
-    print(f"加载数据: {INPUT}")
     df = pd.read_csv(INPUT)
-    print(f"原始形状: {df.shape}")
 
     cols_to_drop = ['instant', 'dteday', 'casual', 'registered', 'temp']
     df = df.drop(columns=cols_to_drop)
-    print(f"删除 {cols_to_drop} 后形状: {df.shape}")
-    print(f"剩余列: {list(df.columns)}")
 
     cat_cols = ['season', 'weathersit', 'mnth', 'weekday']
     df = pd.get_dummies(df, columns=cat_cols, drop_first=False, dtype=int)
-    print(f"One-Hot 编码后形状: {df.shape}")
 
     cols = [c for c in df.columns if c != 'cnt'] + ['cnt']
     df = df[cols]
-    print(f"列顺序调整完成，最后一列: {df.columns[-1]}")
 
-    print("\n=== 数据验证 ===")
-    print(f"NaN 总数: {df.isnull().sum().sum()}")
-    print(f"数据类型: {df.dtypes.value_counts().to_dict()}")
     features = df.drop(columns=['cnt'])
     print(f"特征值范围: [{features.min().min():.4f}, {features.max().max():.4f}]")
     out_of_range = ((features < 0) | (features > 1)).sum().sum()
@@ -46,7 +37,6 @@ def main():
     else:
         print("所有特征值在 [0, 1] 范围内")
 
-    print("\n=== 数据划分 ===")
     indices = df.index.tolist()
     train_idx, temp_idx = train_test_split(
         indices, test_size=0.3, random_state=42
@@ -54,15 +44,12 @@ def main():
     val_idx, test_idx = train_test_split(
         temp_idx, test_size=0.5, random_state=42
     )
-    print(f"训练集: {len(train_idx)} 样本 ({len(train_idx)/len(indices)*100:.1f}%)")
-    print(f"验证集: {len(val_idx)} 样本 ({len(val_idx)/len(indices)*100:.1f}%)")
-    print(f"测试集: {len(test_idx)} 样本 ({len(test_idx)/len(indices)*100:.1f}%)")
 
     assert len(set(train_idx) & set(val_idx)) == 0, "训练集与验证集有重叠"
     assert len(set(train_idx) & set(test_idx)) == 0, "训练集与测试集有重叠"
     assert len(set(val_idx) & set(test_idx)) == 0, "验证集与测试集有重叠"
     assert len(train_idx) + len(val_idx) + len(test_idx) == len(indices), "索引总数不匹配"
-    print("划分验证通过（无重叠、总数匹配）")
+    print("划分验证通过")
 
     split_data = {
         "train_idx": sorted(train_idx),
@@ -71,13 +58,9 @@ def main():
     }
     with open(OUTPUT_JSON, 'w') as f:
         json.dump(split_data, f, indent=2)
-    print(f"索引已保存: {OUTPUT_JSON}")
 
     df.to_csv(OUTPUT_CSV, index=False)
-    print(f"处理后数据已保存: {OUTPUT_CSV}")
-    print(f"  形状: {df.shape}")
 
-    print("\n=== 最终验证 ===")
     final_df = pd.read_csv(OUTPUT_CSV)
     with open(OUTPUT_JSON) as f:
         splits = json.load(f)

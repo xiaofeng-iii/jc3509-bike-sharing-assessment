@@ -40,3 +40,6 @@ Thumbs.db
 # Project specific
 *.log
 .cache/
+
+# Anaconda
+anaconda_projects/

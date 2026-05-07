@@ -25,6 +25,7 @@ JC3509_Assessment_23/
     ├── metrics.csv                    # Model performance metrics
     ├── lr_coefficients.csv            # Linear Regression coefficients
     ├── rf_importances.csv             # Random Forest feature importances
+    ├── rf_best_params.json            # Random Forest best hyperparameters
     └── figures/                       # Visualization outputs
         ├── prediction_scatter.png     # Predicted vs actual values
         ├── feature_importance.png     # Feature importance comparison
@@ -79,6 +80,7 @@ python train_evaluate.py
 - `results/metrics.csv` - Performance metrics (MAE, RMSE, R²)
 - `results/lr_coefficients.csv` - Top-15 LR coefficients
 - `results/rf_importances.csv` - Top-15 RF feature importances
+- `results/rf_best_params.json` - RF best hyperparameters
 - `results/figures/*.png` - 3 visualization plots
 
 **Expected runtime:** 2-5 minutes
@@ -227,6 +229,7 @@ Original data: https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset
 - `results/metrics.csv` - Performance metrics table
 - `results/lr_coefficients.csv` - LR coefficients (top-15)
 - `results/rf_importances.csv` - RF feature importances (top-15)
+- `results/rf_best_params.json` - RF best hyperparameters
 
 ### Visualization Files
 - `results/figures/prediction_scatter.png` - Predicted vs actual scatter plots

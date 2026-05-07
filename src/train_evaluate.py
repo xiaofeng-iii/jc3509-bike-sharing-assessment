@@ -31,7 +31,6 @@ FIGURES_DIR = RESULTS_DIR / "figures"
 
 def load_data():
     """加载数据并按索引划分"""
-    print("=== 加载数据 ===")
     df = pd.read_csv(DATA_CSV)
     print(f"数据形状: {df.shape}")
 
@@ -82,7 +81,6 @@ def evaluate_model(model, X_train, y_train, X_val, y_val, X_test, y_test, model_
 
 def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, feature_names):
     """训练 Linear Regression 并评估"""
-    print("\n=== 训练 Linear Regression ===")
 
     lr = LinearRegression()
     lr.fit(X_train, y_train)
@@ -100,8 +98,6 @@ def train_linear_regression(X_train, y_train, X_val, y_val, X_test, y_test, feat
     coef_df['Coefficient'] = coef_df['Coefficient'].round(2)
     coef_df['Abs_Coefficient'] = coef_df['Abs_Coefficient'].round(2)
 
-    print(f"\nTop-15 特征系数:")
-    print(coef_df[['Feature', 'Abs_Coefficient']].to_string(index=False))
 
     return lr, results, coef_df
 
@@ -118,7 +114,6 @@ def train_random_forest(X_train, y_train, X_val, y_val, X_test, y_test, feature_
     best_rmse = float('inf')
     best_params = None
 
-    print("超参调优中...")
     for n_est in param_grid['n_estimators']:
         for max_d in param_grid['max_depth']:
             rf = RandomForestRegressor(
@@ -141,7 +136,6 @@ def train_random_forest(X_train, y_train, X_val, y_val, X_test, y_test, feature_
     print(f"最佳验证 RMSE: {best_rmse:.2f}")
 
     # 用最佳超参在 train+val 上重训
-    print("\n用最佳超参在 train+val 合并数据上重训...")
     X_train_val = pd.concat([X_train, X_val])
     y_train_val = pd.concat([y_train, y_val])
 
@@ -154,8 +148,8 @@ def train_random_forest(X_train, y_train, X_val, y_val, X_test, y_test, feature_
     rf_final.fit(X_train_val, y_train_val)
     print("最终模型训练完成")
 
-    # 评估（注意：RF 最终模型在 train+val 上训练，val 已被模型见过，
-    # 因此标注为 'train_seen_val' 以避免被误读为独立验证性能）
+    # 评估
+    # val 已被 RF 最终模型见过，因此标注为 'train_seen_val' 以避免被误读为独立验证性能
     results = []
     for dataset_name, X, y in [('train', X_train, y_train),
                                 ('train_seen_val', X_val, y_val),
@@ -188,30 +182,31 @@ def train_random_forest(X_train, y_train, X_val, y_val, X_test, y_test, feature_
 
     return rf_final, results, imp_df, best_params
 
-def save_results(lr_results, rf_results, lr_coef, rf_imp):
+def save_results(lr_results, rf_results, lr_coef, rf_imp, rf_best_params):
     """保存所有结果文件"""
-    print("\n=== 保存结果 ===")
-
     # 保存 metrics.csv
     all_results = lr_results + rf_results
     metrics_df = pd.DataFrame(all_results)
     metrics_path = RESULTS_DIR / "metrics.csv"
     metrics_df.to_csv(metrics_path, index=False)
-    print(f"✓ {metrics_path}")
 
     # 保存 lr_coefficients.csv
     lr_coef_path = RESULTS_DIR / "lr_coefficients.csv"
     lr_coef.to_csv(lr_coef_path, index=False)
-    print(f"✓ {lr_coef_path}")
 
     # 保存 rf_importances.csv
     rf_imp_path = RESULTS_DIR / "rf_importances.csv"
     rf_imp.to_csv(rf_imp_path, index=False)
-    print(f"✓ {rf_imp_path}")
+
+    # 保存 rf_best_params.json
+    params_path = RESULTS_DIR / "rf_best_params.json"
+    with open(params_path, 'w') as f:
+        json.dump(rf_best_params, f, indent=2)
+
+    print("结果已保存")
 
 def plot_prediction_scatter(lr_model, rf_model, X_test, y_test):
     """绘制预测 vs 真实散点图"""
-    print("\n=== 生成预测 vs 真实散点图 ===")
 
     lr_pred = lr_model.predict(X_test)
     rf_pred = rf_model.predict(X_test)
@@ -247,7 +242,6 @@ def plot_prediction_scatter(lr_model, rf_model, X_test, y_test):
 
 def plot_feature_importance(lr_coef, rf_imp):
     """绘制特征重要性对比图"""
-    print("\n=== 生成特征重要性对比图 ===")
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 
@@ -271,8 +265,6 @@ def plot_feature_importance(lr_coef, rf_imp):
 
 def plot_residuals(lr_model, rf_model, X_test, y_test):
     """绘制残差分布图"""
-    print("\n=== 生成残差分布图 ===")
-
     lr_pred = lr_model.predict(X_test)
     rf_pred = rf_model.predict(X_test)
 
@@ -299,41 +291,6 @@ def plot_residuals(lr_model, rf_model, X_test, y_test):
     save_path = FIGURES_DIR / "residuals.png"
     plt.savefig(save_path, dpi=100, bbox_inches='tight')
     plt.close()
-    print(f"✓ {save_path}")
-
-def print_summary(lr_results, rf_results, rf_best_params):
-    """打印实验摘要"""
-    print("\n" + "="*60)
-    print("实验完成摘要")
-    print("="*60)
-
-    print("\n最佳 RF 超参:")
-    print(f"  n_estimators: {rf_best_params['n_estimators']}")
-    print(f"  max_depth: {rf_best_params['max_depth']}")
-
-    print("\nTest 集性能对比:")
-    lr_test = [r for r in lr_results if r['Dataset'] == 'test'][0]
-    rf_test = [r for r in rf_results if r['Dataset'] == 'test'][0]
-
-    print(f"\n  Linear Regression:")
-    print(f"    MAE:  {lr_test['MAE']:.2f}")
-    print(f"    RMSE: {lr_test['RMSE']:.2f}")
-    print(f"    R²:   {lr_test['R²']:.3f}")
-
-    print(f"\n  Random Forest:")
-    print(f"    MAE:  {rf_test['MAE']:.2f}")
-    print(f"    RMSE: {rf_test['RMSE']:.2f}")
-    print(f"    R²:   {rf_test['R²']:.3f}")
-
-    print("\n输出文件:")
-    print(f"  ✓ results/metrics.csv")
-    print(f"  ✓ results/lr_coefficients.csv")
-    print(f"  ✓ results/rf_importances.csv")
-    print(f"  ✓ results/figures/prediction_scatter.png")
-    print(f"  ✓ results/figures/feature_importance.png")
-    print(f"  ✓ results/figures/residuals.png")
-
-    print("\n" + "="*60)
 
 def main():
     X_train, y_train, X_val, y_val, X_test, y_test, feature_names = load_data()
@@ -346,7 +303,7 @@ def main():
         X_train, y_train, X_val, y_val, X_test, y_test, feature_names
     )
 
-    save_results(lr_results, rf_results, lr_coef, rf_imp)
+    save_results(lr_results, rf_results, lr_coef, rf_imp, rf_best_params)
 
     plot_prediction_scatter(lr_model, rf_model, X_test, y_test)
     plot_feature_importance(lr_coef, rf_imp)
