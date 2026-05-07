@@ -154,10 +154,11 @@ def train_random_forest(X_train, y_train, X_val, y_val, X_test, y_test, feature_
     rf_final.fit(X_train_val, y_train_val)
     print("最终模型训练完成")
 
-    # 评估
+    # 评估（注意：RF 最终模型在 train+val 上训练，val 已被模型见过，
+    # 因此标注为 'train_seen_val' 以避免被误读为独立验证性能）
     results = []
     for dataset_name, X, y in [('train', X_train, y_train),
-                                ('val', X_val, y_val),
+                                ('train_seen_val', X_val, y_val),
                                 ('test', X_test, y_test)]:
         y_pred = rf_final.predict(X)
         mae = mean_absolute_error(y, y_pred)
@@ -172,7 +173,7 @@ def train_random_forest(X_train, y_train, X_val, y_val, X_test, y_test, feature_
             'R²': round(r2, 2)
         })
 
-        print(f"  {dataset_name:5s}: MAE={mae:.2f}, RMSE={rmse:.2f}, R²={r2:.3f}")
+        print(f"  {dataset_name:15s}: MAE={mae:.2f}, RMSE={rmse:.2f}, R²={r2:.3f}")
 
     # 提取特征重要性
     imp_df = pd.DataFrame({

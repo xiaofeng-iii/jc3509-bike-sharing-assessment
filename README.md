@@ -20,19 +20,15 @@ JC3509_Assessment_23/
 ├── src/
 │   ├── preprocess.py                  # Data preprocessing script
 │   ├── train_evaluate.py              # Model training & evaluation script
-│   ├── eda.py                         # Exploratory data analysis
 │   └── visualize_eda.py               # EDA visualization
-├── results/
-│   ├── metrics.csv                    # Model performance metrics
-│   ├── lr_coefficients.csv            # Linear Regression coefficients
-│   ├── rf_importances.csv             # Random Forest feature importances
-│   └── figures/                       # Visualization outputs
-│       ├── prediction_scatter.png     # Predicted vs actual values
-│       ├── feature_importance.png     # Feature importance comparison
-│       └── residuals.png              # Residual plots
-└── docs/
-    ├── EDA_报告.md                     # EDA report
-    └── 报告撰写指南.md                  # Report writing guide
+└── results/
+    ├── metrics.csv                    # Model performance metrics
+    ├── lr_coefficients.csv            # Linear Regression coefficients
+    ├── rf_importances.csv             # Random Forest feature importances
+    └── figures/                       # Visualization outputs
+        ├── prediction_scatter.png     # Predicted vs actual values
+        ├── feature_importance.png     # Feature importance comparison
+        └── residuals.png              # Residual plots
 ```
 
 ---
@@ -76,7 +72,7 @@ python train_evaluate.py
   - Grid search: n_estimators [100, 200, 500] × max_depth [None, 10, 20]
   - Selects best params on validation set
   - Retrains on train+val combined data
-- Evaluates both models on train/val/test sets
+- Evaluates both models on train/test sets (RF's validation metrics labeled as `train_seen_val` since val data was used in final retraining)
 - Generates visualizations and saves results
 
 **Output:**
@@ -238,8 +234,7 @@ Original data: https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset
 - `results/figures/residuals.png` - Residual distribution plots
 
 ### Documentation
-- `docs/EDA_报告.md` - Exploratory data analysis report
-- `docs/报告撰写指南.md` - Comprehensive guide for report writing
+- `README.md` - This file
 
 ---
 

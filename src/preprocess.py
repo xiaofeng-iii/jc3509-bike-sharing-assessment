@@ -1,9 +1,9 @@
 """day.csv 预处理脚本
 
-输入: bike+sharing+dataset/day.csv
+输入: data/raw/day.csv
 输出:
-  - preprocessing/day_processed.csv (731×33)
-  - preprocessing/split_indices.json
+  - data/processed/day_processed.csv (731×33)
+  - data/processed/split_indices.json
 """
 import pandas as pd
 import json
@@ -12,8 +12,8 @@ from sklearn.model_selection import train_test_split
 
 # 路径配置
 BASE = Path(__file__).parent.parent
-INPUT = BASE / "day.csv"
-OUTPUT_DIR = Path(__file__).parent
+INPUT = BASE / "data" / "raw" / "day.csv"
+OUTPUT_DIR = BASE / "data" / "processed"
 OUTPUT_CSV = OUTPUT_DIR / "day_processed.csv"
 OUTPUT_JSON = OUTPUT_DIR / "split_indices.json"
 
